@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ATLANT.Migrations
 {
     [DbContext(typeof(FitnesContext))]
-    [Migration("20240331193725_Initial")]
-    partial class Initial
+    [Migration("20240429181959_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

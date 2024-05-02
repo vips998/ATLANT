@@ -21,7 +21,7 @@ namespace ATLANT.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            return await _context.Users.Include(p => p.Client).Include(p => p.Coach).ToListAsync();
         }
 
         [HttpGet("{id}")]

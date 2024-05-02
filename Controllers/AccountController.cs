@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ATLANT.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 
 namespace ATLANT.Controllers
 {
@@ -10,11 +11,13 @@ namespace ATLANT.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-       
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
+        private readonly FitnesContext _context; // контекст для добавления Client в список клиентов после регистрации
+
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, FitnesContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _context = context; 
         }
 
 
@@ -34,13 +37,23 @@ namespace ATLANT.Controllers
                     PhoneNumber = model.PhoneNumber,
                     Birthday = model.Birthday,
                     Email = model.Email,
-                    UserName = model.Email
+                    UserName = model.Nickname,
                 };
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
                     // Установка роли
                     await _userManager.AddToRoleAsync(user, "user");
+
+                    // Создаем клиента с балансом 0 рублей
+                    Client client = new Client
+                    {
+                        UserId = user.Id,
+                        Balance = 0
+                    };
+                    _context.Clients.Add(client);
+                    await _context.SaveChangesAsync();
+
                     // Установка куки
                     await _signInManager.SignInAsync(user, false);
                     return Ok(new { message = "Добавлен новый пользователь: " + user.UserName });    
@@ -80,11 +93,28 @@ namespace ATLANT.Controllers
                     await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
                 if(result.Succeeded)
                 {
-                    var usr = await _userManager.FindByNameAsync(model.Email);
-                    IList<string>? roles = await _userManager.GetRolesAsync(usr);
+                    var user = await _userManager.FindByEmailAsync(model.Email);
+                    IList<string>? roles = await _userManager.GetRolesAsync(user);
                     string? userRole = roles.FirstOrDefault();
-                    return Ok(new { message = "Выполнен вход", usr.Id, userName = model.Email, userRole });
+
+                    // Если клиент авторизовался
+                    if (userRole == "client")
+                    {
+                var client = await _context.Clients.FirstOrDefaultAsync(c => c.UserId == user.Id);
+                if (client != null)
+                {
+                    return Ok(new { message = "Выполнен вход", user.Id, userName = user.Nickname, userRole, clientBalance = client.Balance });
                 }
+                else
+                {
+                    return Ok(new { message = "Выполнен вход, но информация о клиенте не найдена", user.Id, userName = user.Nickname, userRole });
+                }
+                    }
+
+
+                    return Ok(new { message = "Выполнен вход", user.Id, userName = user.Nickname, userRole });
+                }
+
                 else
                 {
                     ModelState.AddModelError("", "Неправильный логин и (или) пароль");

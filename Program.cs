@@ -63,7 +63,7 @@ using (var scope = app.Services.CreateScope())
     var fitnesContext =
         scope.ServiceProvider.GetRequiredService<FitnesContext>();
     await FitnesContextSeed.SeedAsync(fitnesContext);
-    await IdentitySeed.CreateUserRoles(scope.ServiceProvider);
+    await IdentitySeed.CreateUserRoles(scope.ServiceProvider, fitnesContext);
 }
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())
