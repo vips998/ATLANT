@@ -3,6 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using ATLANT.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using System.Runtime.CompilerServices;
 
 namespace ATLANT.Controllers
 {
@@ -12,12 +18,63 @@ namespace ATLANT.Controllers
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly FitnesContext _context; // контекст для добавления Client в список клиентов после регистрации
+        private readonly IConfiguration _configuration;  // Добавить это поле
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, FitnesContext context)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, FitnesContext context, IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _context = context; 
+            _context = context;
+            _configuration = configuration;
+        }
+
+        private string GenerateJwtToken(User user, string role)
+        {
+            try
+            {
+                var claims = new List<Claim>
+                {
+               new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+               new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+               new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+               new Claim("id", user.Id.ToString()),
+               new Claim("userName", user.Nickname.ToString()),
+               new Claim("fio", user.FIO.ToString()),
+               new Claim("birthday",  user.Birthday.ToShortDateString()),
+               new Claim("phonenumber", user.PhoneNumber.ToString()),
+               new Claim("email", user.Email.ToString()),
+               new Claim("userRole", role.ToString()),
+                };
+                // Добавляем баланс только для клиентов
+                if (role == "client")
+                {
+                    var client = _context.Clients.FirstOrDefault(c => c.UserId == user.Id);
+                    if (client != null)
+                    {
+                        claims.Add(new Claim("clientBalance", client.Balance.ToString()));
+                    }
+                }
+
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+                var expires = DateTime.Now.AddDays(Convert.ToDouble(_configuration["Jwt:ExpireDays"]));
+
+                var token = new JwtSecurityToken(
+                    _configuration["Jwt:Issuer"],
+                    _configuration["Jwt:Audience"],
+                    claims,
+                    expires: expires,
+                    signingCredentials: creds
+                );
+
+                return new JwtSecurityTokenHandler().WriteToken(token);
+            }
+            catch (Exception ex)
+            {
+                // Логирование ошибки
+                Console.WriteLine("Ошибка при генерации JWT: " + ex.Message);
+                return null;
+            }
         }
 
 
@@ -37,13 +94,13 @@ namespace ATLANT.Controllers
                     PhoneNumber = model.PhoneNumber,
                     Birthday = model.Birthday,
                     Email = model.Email,
-                    UserName = model.Nickname,
+                    UserName = model.Email,
                 };
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
                     // Установка роли
-                    await _userManager.AddToRoleAsync(user, "user");
+                    await _userManager.AddToRoleAsync(user, "client");
 
                     // Создаем клиента с балансом 0 рублей
                     Client client = new Client
@@ -56,7 +113,11 @@ namespace ATLANT.Controllers
 
                     // Установка куки
                     await _signInManager.SignInAsync(user, false);
-                    return Ok(new { message = "Добавлен новый пользователь: " + user.UserName });    
+
+                    IList<string> roles = await _userManager.GetRolesAsync(user);
+                    string? userRole = roles.FirstOrDefault();
+
+                    return Ok(new { message = "Добавлен новый пользователь: ", user.Id, userName = user.Nickname, userRole, clientBalance = client.Balance, fio = user.FIO, birthday = user.Birthday, phonenumber=user.PhoneNumber, email=user.Email });    
                 }
                 else
                 {
@@ -96,23 +157,49 @@ namespace ATLANT.Controllers
                     var user = await _userManager.FindByEmailAsync(model.Email);
                     IList<string>? roles = await _userManager.GetRolesAsync(user);
                     string? userRole = roles.FirstOrDefault();
+                    var token = GenerateJwtToken(user, userRole);
+                    if (token == null)
+                    {
+                        return StatusCode(500, "Ошибка при создании токена");
+                    }
 
                     // Если клиент авторизовался
                     if (userRole == "client")
                     {
-                var client = await _context.Clients.FirstOrDefaultAsync(c => c.UserId == user.Id);
-                if (client != null)
-                {
-                    return Ok(new { message = "Выполнен вход", user.Id, userName = user.Nickname, userRole, clientBalance = client.Balance });
-                }
-                else
-                {
-                    return Ok(new { message = "Выполнен вход, но информация о клиенте не найдена", user.Id, userName = user.Nickname, userRole });
-                }
+                        var client = await _context.Clients.FirstOrDefaultAsync(c => c.UserId == user.Id);
+                        if (client != null)
+                        {
+                            return Ok(new { token, message = "Выполнен вход", user.Id, userName = user.Nickname, userRole, clientBalance = client.Balance, fio = user.FIO, birthday = user.Birthday, phonenumber = user.PhoneNumber, email = user.Email });
+                        }
+                        else
+                        {
+                            return Ok(new { token, message = "Выполнен вход, но информация о клиенте не найдена", user.Id, userName = user.Nickname, userRole });
+                        }
+                    }
+                    // Если тренер авторизовался
+                    if(userRole == "coach")
+                    {
+                        var coach = await _context.Coachs.FirstOrDefaultAsync(c => c.UserId == user.Id);
+                        if(coach != null)
+                        {
+                            return Ok(new { token, message = "Выполнен вход", user.Id, userName = user.Nickname, userRole, fio = user.FIO, birthday = user.Birthday, phonenumber = user.PhoneNumber, email = user.Email });
+                        }
+                        else
+                        {
+                            return Ok(new { token, message = "Выполнен вход, но информация о тренере не найдена", user.Id, userName = user.Nickname, userRole });
+                        }
+                    }
+
+                    // Если админ авторизовался
+                    if (userRole == "admin")
+                    {
+                        {
+                            return Ok(new { token, message = "Выполнен вход", user.Id, userName = user.Nickname, userRole, fio = user.FIO, birthday = user.Birthday, phonenumber = user.PhoneNumber, email = user.Email });
+                        }
                     }
 
 
-                    return Ok(new { message = "Выполнен вход", user.Id, userName = user.Nickname, userRole });
+                    return Ok(new { token, message = "Выполнен вход", user.Id, userName = user.Nickname, userRole, fio = user.FIO, birthday = user.Birthday, phonenumber = user.PhoneNumber, email = user.Email });
                 }
 
                 else

@@ -1,4 +1,5 @@
-﻿using ATLANT.Models;
+﻿using ATLANT.DTO;
+using ATLANT.Models;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -34,6 +35,30 @@ namespace ATLANT.Controllers
                 return NotFound();
             }
             return Ok(user);
+        }
+
+        [HttpPut("{userId}")]
+        public async Task<IActionResult> UpdateBalance(int userId, [FromBody] BalanceUpdateDTO balanceUpdate)
+        {
+            var client = await _context.Clients.FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (client == null)
+            {
+                return NotFound();
+            }
+
+            client.Balance = balanceUpdate.NewBalance;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest();
+            }
+
+            return NoContent();
         }
     }
 }
