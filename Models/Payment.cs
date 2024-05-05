@@ -11,10 +11,6 @@ namespace ATLANT.Models
         }
         [Key]
         public int Id { get; set; }
-        
-        [Required]
-        [StringLength(8)]
-        public string NumberCard { get; set; }
 
         [Required]
         [DataType(DataType.Date)]
@@ -27,6 +23,17 @@ namespace ATLANT.Models
         public DateTime DateEnd { get; set; }
         [Required]
         public int CountRemainTraining { get; set; }
+
+        [Required]
+        public bool IsValid { get; set; }
+
+        [ForeignKey("Client")]
+        public int UserId { get; set; }
+        public virtual Client Client { get; set; }
+
+        [ForeignKey("Abonement")]
+        public int AbonementId { get; set; }
+        public virtual Abonement Abonement { get; set; }
 
         public virtual ICollection<VisitRegister> VisitRegister { get; set; }
 

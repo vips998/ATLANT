@@ -74,28 +74,15 @@ PhoneNumber = "89159162232", Email="komarVal@mail.ru"}
                 }
                 await context.SaveChangesAsync();
 
-                var payments = new Payment[]
-                {
-new Payment{NumberCard="33212459", CountRemainTraining=10,
-    DateStart=new DateTime(2024-03-01),DateEnd=new DateTime(2024-06-01)},
-new Payment{NumberCard="12345678", CountRemainTraining=15,
-    DateStart=new DateTime(2024-01-01),DateEnd=new DateTime(2024-06-01)}
-                };
-
-                foreach (Payment p in payments)
-                {
-                    context.Payment.Add(p);
-                }
-                await context.SaveChangesAsync();
 
                 var abonements = new Abonement[]
                 {
  new Abonement
- {Name = "Месячный", Cost=2000,CountDays = 30, CountMonths=1, CountVisits = 100, TypeService="Йога", TypeTraining = "Групповая", Payment = payments},
+ {Name = "Месячный", Cost=2000,CountDays = 30, CountVisits = 100, TypeService="Йога", TypeTraining = "Групповая"},
  new Abonement
- {Name = "3-х месячный", Cost=5000,CountDays = 100, CountMonths=3, CountVisits = 100, TypeService="Бокс", TypeTraining = "Групповая"},
+ {Name = "3-х месячный", Cost=5000,CountDays = 100, CountVisits = 100, TypeService="Бокс", TypeTraining = "Групповая"},
  new Abonement
-{Name = "10 дней", Cost=1000,CountDays = 10, CountMonths=0, CountVisits = 10, TypeService="Тренажерный зал", TypeTraining = "Индивидуальная"}
+{Name = "10 дней", Cost=1000,CountDays = 10, CountVisits = 10, TypeService="Тренажерный зал", TypeTraining = "Индивидуальная"}
             };
                 foreach (Abonement a in abonements)
                 {

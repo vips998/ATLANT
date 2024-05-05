@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ATLANT.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -21,7 +21,6 @@ namespace ATLANT.Migrations
                     Cost = table.Column<decimal>(type: "money", nullable: false),
                     CountVisits = table.Column<int>(type: "int", nullable: false),
                     CountDays = table.Column<int>(type: "int", nullable: false),
-                    CountMonths = table.Column<int>(type: "int", nullable: false),
                     TypeService = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TypeTraining = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
@@ -260,12 +259,12 @@ namespace ATLANT.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    NumberCard = table.Column<string>(type: "nvarchar(8)", maxLength: 8, nullable: false),
                     DateStart = table.Column<DateTime>(type: "date", nullable: false),
                     DateEnd = table.Column<DateTime>(type: "date", nullable: false),
                     CountRemainTraining = table.Column<int>(type: "int", nullable: false),
-                    AbonementId = table.Column<int>(type: "int", nullable: true),
-                    ClientUserId = table.Column<int>(type: "int", nullable: true)
+                    IsValid = table.Column<bool>(type: "bit", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    AbonementId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -274,12 +273,14 @@ namespace ATLANT.Migrations
                         name: "FK_Payment_Abonement_AbonementId",
                         column: x => x.AbonementId,
                         principalTable: "Abonement",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Payment_Clients_ClientUserId",
-                        column: x => x.ClientUserId,
+                        name: "FK_Payment_Clients_UserId",
+                        column: x => x.UserId,
                         principalTable: "Clients",
-                        principalColumn: "UserId");
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -430,9 +431,9 @@ namespace ATLANT.Migrations
                 column: "AbonementId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Payment_ClientUserId",
+                name: "IX_Payment_UserId",
                 table: "Payment",
-                column: "ClientUserId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Shedule_CoachId",

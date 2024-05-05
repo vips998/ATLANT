@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ATLANT.Migrations
 {
     [DbContext(typeof(FitnesContext))]
-    [Migration("20240429181959_Init")]
-    partial class Init
+    [Migration("20240505101315_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,9 +37,6 @@ namespace ATLANT.Migrations
                         .HasColumnType("money");
 
                     b.Property<int>("CountDays")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CountMonths")
                         .HasColumnType("int");
 
                     b.Property<int>("CountVisits")
@@ -112,10 +109,7 @@ namespace ATLANT.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AbonementId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ClientUserId")
+                    b.Property<int>("AbonementId")
                         .HasColumnType("int");
 
                     b.Property<int>("CountRemainTraining")
@@ -127,16 +121,17 @@ namespace ATLANT.Migrations
                     b.Property<DateTime>("DateStart")
                         .HasColumnType("date");
 
-                    b.Property<string>("NumberCard")
-                        .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("nvarchar(8)");
+                    b.Property<bool>("IsValid")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AbonementId");
 
-                    b.HasIndex("ClientUserId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Payment");
                 });
@@ -525,13 +520,21 @@ namespace ATLANT.Migrations
 
             modelBuilder.Entity("ATLANT.Models.Payment", b =>
                 {
-                    b.HasOne("ATLANT.Models.Abonement", null)
+                    b.HasOne("ATLANT.Models.Abonement", "Abonement")
                         .WithMany("Payment")
-                        .HasForeignKey("AbonementId");
+                        .HasForeignKey("AbonementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("ATLANT.Models.Client", null)
+                    b.HasOne("ATLANT.Models.Client", "Client")
                         .WithMany("Payment")
-                        .HasForeignKey("ClientUserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Abonement");
+
+                    b.Navigation("Client");
                 });
 
             modelBuilder.Entity("ATLANT.Models.Shedule", b =>

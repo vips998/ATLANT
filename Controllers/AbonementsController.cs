@@ -58,7 +58,6 @@ namespace ATLANT.Controllers
                 Name = abonement.Name,
                 Cost = abonement.Cost,
                 CountDays = abonement.CountDays,
-                CountMonths = abonement.CountMonths,
                 CountVisits = abonement.CountVisits,
                 TypeService = abonement.TypeService,
                 TypeTraining = abonement.TypeTraining
@@ -88,7 +87,6 @@ namespace ATLANT.Controllers
             itemAbonement.Name = abonement.Name;
             itemAbonement.Cost = abonement.Cost;
             itemAbonement.CountDays = abonement.CountDays;
-            itemAbonement.CountMonths = abonement.CountMonths;
             itemAbonement.CountVisits = abonement.CountVisits;
             itemAbonement.TypeService = abonement.TypeService;
             itemAbonement.TypeTraining = abonement.TypeTraining;

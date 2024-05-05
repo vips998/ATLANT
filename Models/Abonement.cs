@@ -21,7 +21,6 @@ namespace ATLANT.Models
         public decimal Cost { get; set; }
         public int CountVisits { get; set; }
         public int CountDays { get; set; }
-        public int CountMonths { get; set; }
 
         [Required]
         public string TypeService { get; set; }
