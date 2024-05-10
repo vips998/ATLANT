@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ATLANT.Migrations
 {
     [DbContext(typeof(FitnesContext))]
-    [Migration("20240505101315_init")]
+    [Migration("20240509142103_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -207,7 +207,7 @@ namespace ATLANT.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("CoachUserId")
+                    b.Property<int>("CoachId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Date")
@@ -216,7 +216,7 @@ namespace ATLANT.Migrations
                     b.Property<int>("MaxCount")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ServiceTypeId")
+                    b.Property<int>("ServiceTypeId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("TimeEnd")
@@ -225,12 +225,12 @@ namespace ATLANT.Migrations
                     b.Property<DateTime>("TimeStart")
                         .HasColumnType("datetime");
 
-                    b.Property<int?>("TypeTrainingId")
+                    b.Property<int>("TypeTrainingId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CoachUserId");
+                    b.HasIndex("CoachId");
 
                     b.HasIndex("ServiceTypeId");
 
@@ -574,17 +574,29 @@ namespace ATLANT.Migrations
 
             modelBuilder.Entity("ATLANT.Models.TimeTable", b =>
                 {
-                    b.HasOne("ATLANT.Models.Coach", null)
+                    b.HasOne("ATLANT.Models.Coach", "Coach")
                         .WithMany("TimeTable")
-                        .HasForeignKey("CoachUserId");
+                        .HasForeignKey("CoachId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("ATLANT.Models.ServiceType", null)
+                    b.HasOne("ATLANT.Models.ServiceType", "ServiceType")
                         .WithMany("TimeTable")
-                        .HasForeignKey("ServiceTypeId");
+                        .HasForeignKey("ServiceTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("ATLANT.Models.TypeTraining", null)
+                    b.HasOne("ATLANT.Models.TypeTraining", "TypeTraining")
                         .WithMany("TimeTable")
-                        .HasForeignKey("TypeTrainingId");
+                        .HasForeignKey("TypeTrainingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Coach");
+
+                    b.Navigation("ServiceType");
+
+                    b.Navigation("TypeTraining");
                 });
 
             modelBuilder.Entity("ATLANT.Models.VisitRegister", b =>

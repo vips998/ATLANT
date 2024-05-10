@@ -23,7 +23,7 @@ namespace ATLANT.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ServiceType>>> GetServiceTypes()
         {
-            return await _context.ServiceType.Include(g => g.Shedule).ToListAsync();
+            return await _context.ServiceType.ToListAsync();
         }
 
         [HttpGet("{id}")]

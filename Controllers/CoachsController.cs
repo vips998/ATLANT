@@ -21,7 +21,7 @@ namespace ATLANT.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Coach>>> GetCoachs()
         {
-            return await _context.Coachs.Include(g => g.Shedule).Include(g => g.User).ToListAsync();
+            return await _context.Coachs.Include(g => g.User).ToListAsync();
         }
 
         [HttpGet("{id}")]

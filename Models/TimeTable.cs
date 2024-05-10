@@ -29,6 +29,12 @@ namespace ATLANT.Models
         [DataType(DataType.Date)]
         [Column(TypeName = "datetime")]
         public DateTime TimeEnd { get; set; }
+        public int CoachId { get; set; }
+        public virtual Coach Coach { get; set; }
+        public int ServiceTypeId { get; set; }
+        public virtual ServiceType ServiceType { get; set; }
+        public int TypeTrainingId { get; set; }
+        public virtual TypeTraining TypeTraining { get; set; }
 
         public virtual ICollection<VisitRegister> VisitRegister { get; set; }
 

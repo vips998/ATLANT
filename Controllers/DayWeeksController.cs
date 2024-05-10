@@ -23,7 +23,7 @@ namespace ATLANT.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<DayWeek>>> GetDayWeeks()
         {
-            return await _context.DayWeek.Include(g => g.Shedule).ToListAsync();
+            return await _context.DayWeek.ToListAsync();
         }
 
         // GET: DayWeeksController/Details/5

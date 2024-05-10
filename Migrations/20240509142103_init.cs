@@ -337,28 +337,31 @@ namespace ATLANT.Migrations
                     Date = table.Column<DateTime>(type: "date", nullable: false),
                     TimeStart = table.Column<DateTime>(type: "datetime", nullable: false),
                     TimeEnd = table.Column<DateTime>(type: "datetime", nullable: false),
-                    CoachUserId = table.Column<int>(type: "int", nullable: true),
-                    ServiceTypeId = table.Column<int>(type: "int", nullable: true),
-                    TypeTrainingId = table.Column<int>(type: "int", nullable: true)
+                    CoachId = table.Column<int>(type: "int", nullable: false),
+                    ServiceTypeId = table.Column<int>(type: "int", nullable: false),
+                    TypeTrainingId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TimeTable", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TimeTable_Coachs_CoachUserId",
-                        column: x => x.CoachUserId,
+                        name: "FK_TimeTable_Coachs_CoachId",
+                        column: x => x.CoachId,
                         principalTable: "Coachs",
-                        principalColumn: "UserId");
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_TimeTable_ServiceType_ServiceTypeId",
                         column: x => x.ServiceTypeId,
                         principalTable: "ServiceType",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_TimeTable_TypeTraining_TypeTrainingId",
                         column: x => x.TypeTrainingId,
                         principalTable: "TypeTraining",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -456,9 +459,9 @@ namespace ATLANT.Migrations
                 column: "TypeTrainingId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TimeTable_CoachUserId",
+                name: "IX_TimeTable_CoachId",
                 table: "TimeTable",
-                column: "CoachUserId");
+                column: "CoachId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TimeTable_ServiceTypeId",

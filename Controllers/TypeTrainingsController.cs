@@ -23,7 +23,7 @@ namespace ATLANT.Controllers
             [HttpGet]
             public async Task<ActionResult<IEnumerable<TypeTraining>>> GetTypeTrainings()
             {
-                return await _context.TypeTraining.Include(g => g.Shedule).ToListAsync();
+                return await _context.TypeTraining.ToListAsync();
             }
 
             [HttpGet("{id}")]
