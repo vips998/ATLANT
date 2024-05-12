@@ -39,7 +39,7 @@ namespace ATLANT.Controllers
                 case DayOfWeek.Sunday:
                     return "Воскресение";
                 default:
-                    return "";
+                    return "Неизвестный день недели";
             }
         }
 
@@ -102,7 +102,7 @@ namespace ATLANT.Controllers
 
             if (existingSchedules.Any())
             {
-                return BadRequest("На указанные даты уже есть тренировки в расписании.");
+                return BadRequest();
             }
 
             foreach (var date in dates)

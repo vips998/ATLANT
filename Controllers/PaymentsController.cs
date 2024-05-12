@@ -66,6 +66,7 @@ namespace ATLANT.Controllers
             {
                 // Обновление флага IsValid для недействительных платежей
                 payment.IsValid = false;
+                _context.Payment.Update(payment);
             }
             await _context.SaveChangesAsync();
 

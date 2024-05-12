@@ -370,9 +370,10 @@ namespace ATLANT.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    VisitNumber = table.Column<int>(type: "int", nullable: false),
-                    PaymentId = table.Column<int>(type: "int", nullable: true),
-                    TimeTableId = table.Column<int>(type: "int", nullable: true)
+                    VisitDate = table.Column<bool>(type: "bit", nullable: false),
+                    IsPresent = table.Column<bool>(type: "bit", nullable: false),
+                    TimeTableId = table.Column<int>(type: "int", nullable: false),
+                    PaymentId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -381,7 +382,8 @@ namespace ATLANT.Migrations
                         name: "FK_VisitRegister_Payment_PaymentId",
                         column: x => x.PaymentId,
                         principalTable: "Payment",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_VisitRegister_TimeTable_TimeTableId",
                         column: x => x.TimeTableId,

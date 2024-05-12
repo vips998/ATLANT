@@ -31,8 +31,8 @@ namespace ATLANT.Models
         public virtual DbSet<Coach> Coachs { get; set; }
         public virtual DbSet<Abonement> Abonement { get; set; }
         public virtual DbSet<Payment> Payment { get; set; }
-        public virtual DbSet<VisitRegister> VisitRegister { get; set; }
         public virtual DbSet<TimeTable> TimeTable { get; set; }
+        public virtual DbSet<VisitRegister> VisitRegister { get; set; }
         public virtual DbSet<TypeTraining> TypeTraining { get; set; }
         public virtual DbSet<ServiceType> ServiceType { get; set; }
         public virtual DbSet<Shedule> Shedule { get; set; }
@@ -40,6 +40,11 @@ namespace ATLANT.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<VisitRegister>()
+    .HasOne(v => v.TimeTable)
+    .WithMany(t => t.VisitRegister)
+    .HasForeignKey(v => v.TimeTableId)
+    .OnDelete(DeleteBehavior.NoAction);
             base.OnModelCreating(modelBuilder);
         }
     }

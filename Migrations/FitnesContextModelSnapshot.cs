@@ -342,14 +342,17 @@ namespace ATLANT.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("PaymentId")
+                    b.Property<bool>("IsPresent")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PaymentId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TimeTableId")
+                    b.Property<int>("TimeTableId")
                         .HasColumnType("int");
 
-                    b.Property<int>("VisitNumber")
-                        .HasColumnType("int");
+                    b.Property<bool>("VisitDate")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -598,13 +601,21 @@ namespace ATLANT.Migrations
 
             modelBuilder.Entity("ATLANT.Models.VisitRegister", b =>
                 {
-                    b.HasOne("ATLANT.Models.Payment", null)
+                    b.HasOne("ATLANT.Models.Payment", "Payment")
                         .WithMany("VisitRegister")
-                        .HasForeignKey("PaymentId");
+                        .HasForeignKey("PaymentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("ATLANT.Models.TimeTable", null)
+                    b.HasOne("ATLANT.Models.TimeTable", "TimeTable")
                         .WithMany("VisitRegister")
-                        .HasForeignKey("TimeTableId");
+                        .HasForeignKey("TimeTableId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Payment");
+
+                    b.Navigation("TimeTable");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>

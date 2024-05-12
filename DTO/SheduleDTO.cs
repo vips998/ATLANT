@@ -5,22 +5,17 @@ namespace ATLANT.DTO
 {
     public class SheduleDTO
     {
-        [Key]
         public int Id { get; set; }
-        [Required]
         public int MaxCount { get; set; }
 
-        [Required]
         [DataType(DataType.Date)]
         [Column(TypeName = "date")]
         public DateTime Date { get; set; }
 
-        [Required]
         [DataType(DataType.Date)]
         [Column(TypeName = "datetime")]
         public DateTime TimeStart { get; set; }
 
-        [Required]
         [DataType(DataType.Date)]
         [Column(TypeName = "datetime")]
         public DateTime TimeEnd { get; set; }

@@ -6,20 +6,17 @@ namespace ATLANT.DTO
     public class TimeTableDTO
     {
 
-        [Required]
+        public int Id { get; set; }
         public int MaxCount { get; set; }
 
-        [Required]
         [DataType(DataType.Date)]
         [Column(TypeName = "date")]
         public DateTime Date { get; set; }
 
-        [Required]
         [DataType(DataType.Date)]
         [Column(TypeName = "datetime")]
         public DateTime TimeStart { get; set; }
 
-        [Required]
         [DataType(DataType.Date)]
         [Column(TypeName = "datetime")]
         public DateTime TimeEnd { get; set; }

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ATLANT.Controllers
 {
-    [Route("api/[controller]")] // добавление к маршруту. То есть можем указать просто Coachs
+    [Route("api/[controller]")] // добавление к маршруту.
     [EnableCors]
     [ApiController]
     public class ServiceTypesController : Controller

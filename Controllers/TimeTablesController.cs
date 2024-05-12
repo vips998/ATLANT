@@ -45,7 +45,7 @@ namespace ATLANT.Controllers
         // Добавление нового абонемента
 
         [HttpPost]
-        public async Task<ActionResult<TimeTable>> PostShedule(TimeTableDTO newTimeTable)
+        public async Task<ActionResult<TimeTable>> PostTimeTable(TimeTableDTO newTimeTable)
         {
             var timetable = new TimeTable
             {
@@ -64,6 +64,51 @@ namespace ATLANT.Controllers
             return Ok(timetable);
         }
 
+        // PUT api/<TimeTablesController>/5
+        // Изменение существующей тренировки
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutTimeTable(int id, TimeTableDTO timetable)
+        {
+            if (id != timetable.Id)
+            {
+                return BadRequest();
+            }
+
+            var itemTimetable = _context.TimeTable.Find(id);
+            if (itemTimetable == null)
+            {
+                return NotFound();
+            }
+
+            //проверяем на поесещение
+            var timetableForVisit = await _context.TimeTable
+        .Include(t => t.VisitRegister)
+        .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (timetableForVisit == null)
+            {
+                return NotFound();
+            }
+
+            if (timetableForVisit.VisitRegister?.Count > 0)
+                {
+                // нельзя изменить тренировку с посещениями
+                return BadRequest();
+            }
+
+            itemTimetable.MaxCount = timetable.MaxCount;
+            itemTimetable.Date = timetable.Date;
+            itemTimetable.TimeStart = timetable.TimeStart;
+            itemTimetable.TimeEnd = timetable.TimeEnd;
+            itemTimetable.CoachId = timetable.CoachId;
+            itemTimetable.ServiceTypeId = timetable.ServiceTypeId;
+            itemTimetable.TypeTrainingId = timetable.TypeTrainingId;
+
+            _context.TimeTable.Update(itemTimetable);
+            await _context.SaveChangesAsync();
+            return Ok(itemTimetable);
+            //return NoContent();
+        }
 
 
         // DELETE api/<TimeTablesController>/5
@@ -72,10 +117,18 @@ namespace ATLANT.Controllers
         [Authorize(Roles = "admin")] // Ограничение доступа (Только для админа)
         public async Task<IActionResult> DeleteTimeTables(int id)
         {
-            var timetable = await _context.TimeTable.FindAsync(id);
+            var timetable = await _context.TimeTable
+        .Include(t => t.VisitRegister)
+        .FirstOrDefaultAsync(t => t.Id == id);
+
             if (timetable == null)
             {
                 return NotFound();
+            }
+
+            if (timetable.VisitRegister?.Count > 0)
+            {
+                return BadRequest("Нельзя удалить тренировку с записанными клиентами.");
             }
             _context.TimeTable.Remove(timetable);
             await _context.SaveChangesAsync();

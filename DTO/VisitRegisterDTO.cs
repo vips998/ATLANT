@@ -1,28 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Xml;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
-namespace ATLANT.Models
+namespace ATLANT.DTO
 {
-    public class VisitRegister
+    public class VisitRegisterDTO
     {
 
-        [Key]
         public int Id { get; set; }
 
-        [Required]
         public bool VisitDate { get; set; } // false - тренировка ещё не прошла, true - тренировка прошла
 
-        [Required]
         public bool IsPresent { get; set; } // false - пропустил тренировку, true - присутствовал на тренировке 
 
-        [ForeignKey("TimeTable")]
         public int TimeTableId { get; set; }
-        public virtual TimeTable TimeTable { get; set; }
-
-        [ForeignKey("Payment")]
         public int PaymentId { get; set; }
-        public virtual Payment Payment { get; set; }
-
     }
 }
