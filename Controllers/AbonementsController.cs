@@ -60,12 +60,11 @@ namespace ATLANT.Controllers
                 CountDays = abonement.CountDays,
                 CountVisits = abonement.CountVisits,
                 TypeService = abonement.TypeService,
-                TypeTraining = abonement.TypeTraining
 
             };
             _context.Abonement.Add(abo);
             await _context.SaveChangesAsync();
-            return Ok();
+            return Ok(abo);
         }
 
         // PUT api/<AbonementsController>/5
@@ -89,7 +88,6 @@ namespace ATLANT.Controllers
             itemAbonement.CountDays = abonement.CountDays;
             itemAbonement.CountVisits = abonement.CountVisits;
             itemAbonement.TypeService = abonement.TypeService;
-            itemAbonement.TypeTraining = abonement.TypeTraining;
             _context.Abonement.Update(itemAbonement);
             await _context.SaveChangesAsync();
             return Ok(itemAbonement);

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ATLANT.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class init2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -21,8 +21,7 @@ namespace ATLANT.Migrations
                     Cost = table.Column<decimal>(type: "money", nullable: false),
                     CountVisits = table.Column<int>(type: "int", nullable: false),
                     CountDays = table.Column<int>(type: "int", nullable: false),
-                    TypeService = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TypeTraining = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    TypeService = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -92,7 +91,9 @@ namespace ATLANT.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    NameService = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    NameService = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    ImageLink = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -240,7 +241,9 @@ namespace ATLANT.Migrations
                 name: "Coachs",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    ImageLink = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true)
                 },
                 constraints: table =>
                 {

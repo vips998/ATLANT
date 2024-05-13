@@ -25,7 +25,6 @@ namespace ATLANT.Models
         [Required]
         public string TypeService { get; set; }
         [Required]
-        public string TypeTraining { get; set; }
         public virtual ICollection<Payment> Payment { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Xml;
 
 namespace ATLANT.Controllers
 {
@@ -50,10 +51,12 @@ namespace ATLANT.Controllers
             ServiceType serviceTYPE = new ServiceType
             {
                 NameService = service.NameService,
+                Description = service.Description,
+                ImageLink = "https://lh3.google.com/u/0/d/1hMIrsLAXNHLVAZsIMwOOIMHxAEVxGjeM",
             };
             _context.ServiceType.Add(serviceTYPE);
             await _context.SaveChangesAsync();
-            return Ok();
+            return Ok(serviceTYPE);
         }
 
         // PUT api/<ServiceTypesController>/5
@@ -73,6 +76,7 @@ namespace ATLANT.Controllers
             }
 
             itemServiceType.NameService = service.NameService;
+            itemServiceType.Description = service.Description;
             _context.ServiceType.Update(itemServiceType);
             await _context.SaveChangesAsync();
             return Ok(itemServiceType);
@@ -90,6 +94,27 @@ namespace ATLANT.Controllers
             {
                 return NotFound();
             }
+
+
+            // Получаем список всех расписаний
+            var timetables = await _context.TimeTable.ToListAsync();
+
+            // Проверка на наличие записей в visitRegisters
+            foreach (var timetable in timetables)
+            {
+                if (timetable.ServiceTypeId == id)
+                {
+                    var visitRegistersCount = await _context.VisitRegister
+                        .Where(vr => vr.TimeTableId == timetable.Id)
+                        .CountAsync();
+
+                    if (visitRegistersCount > 0)
+                    {
+                        return BadRequest("Удаление невозможно, так как есть тренировки с записанными клиентами.");
+                    }
+                }
+            }
+
             _context.ServiceType.Remove(service);
             await _context.SaveChangesAsync();
             return NoContent();

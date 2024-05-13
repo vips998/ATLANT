@@ -18,8 +18,10 @@ namespace ATLANT.Data
 
                 var servicestypes = new ServiceType[]
                 {
- new ServiceType { NameService = "Йога"},
- new ServiceType {NameService = "Бокс"}
+ new ServiceType { NameService = "Йога", ImageLink="https://lh3.google.com/u/0/d/1W5vO5oCc6uk2-2k07Bw9gGF9_2mb2VAq", Description="Древняя духовная практика, пришедшая к нам из Индии. Она состоит из восьми ступеней, затрагивающих все аспекты человеческого бытия – от соблюдения моральных принципов, работы с телом и с дыханием, до более тонких техник управления психикой, умом и сознанием."},
+ new ServiceType {NameService = "Бокс",ImageLink="https://lh3.google.com/u/0/d/1nhG4rQ5ljU3xRUm_yAXlgmQY0LRtcHUF", Description="Смысл этого боевого искусства заключается в том, чтобы любой человек с помощью специальной подготовки, наработанных навыков, скорости и выносливости смог побеждать более крупных по весу и силе противников, уверенно противостоять группе нападающих, легко уходить от ударов и проводить молниеносные атаки."},
+ new ServiceType {NameService="Карате", ImageLink="https://lh3.google.com/u/0/d/1HUGejrXHKxeYLIht0YPjAchG9KAM29W4", Description="Популярное боевое искусство, которое направлено на изучение приемов самообороны. Тренировки состоят из активных движений руками и ногами, прыжков, изучения системы блоков для самозащиты и других элементов. Коме того, в карате внимание уделяется навыкам концентрации и психологической подготовке."},
+ new ServiceType {NameService="Пауэрлифтинг", ImageLink="https://lh3.google.com/u/0/d/1gMa-uoCtBAVuMzjvmpVFYMc_m9fHwBiT",Description="Популярное силовое троеборье, потому что включает в себя три основных упражнения: приседания со штангой на плечах, жим лежа и становую тягу. Все эти упражнения направлены на то, чтобы показать физическую форму спортсмена, а также его силовые качества."}    
                 };
                 foreach (ServiceType st in servicestypes)
                 {
@@ -38,51 +40,16 @@ namespace ATLANT.Data
                 }
                 await context.SaveChangesAsync();
 
-                var users = new User[]
-                {
- new User {FIO = "Карпов Владислав Дмитриевич", Birthday = new DateTime(2002,07,20),
-PhoneNumber = "89621892871", Email="vips998@mail.ru"},
- new User { FIO = "Замыцкий Илья Сергеевич", Birthday = new DateTime(2002,08,02),
-PhoneNumber = "88005553535", Email="zam123@mail.ru"},
- new User { FIO = "Комаров Валерий Алексеевич", Birthday = new DateTime(2002,06,25),
-PhoneNumber = "89159162232", Email="komarVal@mail.ru"}
-            };
-                foreach (User f in users)
-                {
-                    context.Users.Add(f);
-                }
-                await context.SaveChangesAsync();
-
-
-                var clients = new Client[]
-                {
- new Client {User = users[1], Balance = 10000},
-            };
-                foreach (Client g in clients)
-                {
-                    context.Clients.Add(g);
-                }
-                await context.SaveChangesAsync();
-
-                var coachs = new Coach[]
-                {
- new Coach {User = users[2]},
-            };
-                foreach (Coach c in coachs)
-                {
-                    context.Coachs.Add(c);
-                }
-                await context.SaveChangesAsync();
-
-
                 var abonements = new Abonement[]
                 {
  new Abonement
- {Name = "Месячный", Cost=2000,CountDays = 30, CountVisits = 100, TypeService="Йога", TypeTraining = "Групповая"},
+ {Name = "Месячный", Cost=2000,CountDays = 30, CountVisits = 100, TypeService="Йога"},
  new Abonement
- {Name = "3-х месячный", Cost=5000,CountDays = 100, CountVisits = 100, TypeService="Бокс", TypeTraining = "Групповая"},
+ {Name = "3-х месячный", Cost=5000,CountDays = 100, CountVisits = 100, TypeService="Бокс"},
  new Abonement
-{Name = "10 дней", Cost=1000,CountDays = 10, CountVisits = 10, TypeService="Тренажерный зал", TypeTraining = "Индивидуальная"}
+{Name = "10 дней", Cost=1000,CountDays = 10, CountVisits = 10, TypeService="Карате"},
+ new Abonement
+{Name = "Неделя", Cost=700,CountDays = 7, CountVisits = 7, TypeService="Пауэрлифтинг"}
             };
                 foreach (Abonement a in abonements)
                 {
@@ -100,31 +67,6 @@ new DayWeek{ Day = "Воскресение"}
                 foreach (DayWeek dw in daysweek)
                 {
                     context.DayWeek.Add(dw);
-                }
-                await context.SaveChangesAsync();
-
-                var shedules = new Shedule[]
-{
-new Shedule{ MaxCount = 10, Date=new DateTime(2024, 4, 8), TimeStart= new DateTime(2024, 4, 8, 9, 0, 0), 
-    TimeEnd = new DateTime(2024, 4, 8, 11, 0, 0), DayWeek = daysweek[0], Coach=coachs[0], ServiceType = servicestypes[0],
- TypeTraining = typetraining[0]},
-new Shedule{ MaxCount = 10, Date=new DateTime(2024, 4, 8), TimeStart= new DateTime(2024, 4, 8, 11, 0, 0),
-    TimeEnd = new DateTime(2024, 4, 8, 13, 0, 0), DayWeek = daysweek[0], Coach=coachs[0], ServiceType = servicestypes[1],
- TypeTraining = typetraining[1]},
-new Shedule{ MaxCount = 10, Date=new DateTime(2024, 4, 8), TimeStart= new DateTime(2024, 4, 8, 13, 0, 0),
-    TimeEnd = new DateTime(2024, 4, 8, 15, 0, 0), DayWeek = daysweek[0], Coach=coachs[0], ServiceType = servicestypes[0],
- TypeTraining = typetraining[0]},
-new Shedule{ MaxCount = 10, Date=new DateTime(2024, 4, 9), TimeStart= new DateTime(2024, 4, 9, 9, 0, 0),
-    TimeEnd = new DateTime(2024, 4, 9, 12, 0, 0), DayWeek = daysweek[1], Coach=coachs[0], ServiceType = servicestypes[1],
- TypeTraining = typetraining[0]},
-new Shedule{ MaxCount = 10, Date=new DateTime(2024, 4, 10), TimeStart= new DateTime(2024, 4, 10, 9, 0, 0),
-    TimeEnd = new DateTime(2024, 4, 10, 12, 0, 0), DayWeek = daysweek[2], Coach=coachs[0], ServiceType = servicestypes[0],
- TypeTraining = typetraining[0]},
-};
-
-                foreach (Shedule sh in shedules)
-                {
-                    context.Shedule.Add(sh);
                 }
                 await context.SaveChangesAsync();
 

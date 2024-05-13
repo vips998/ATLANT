@@ -17,6 +17,5 @@ namespace ATLANT.DTO
         public int CountVisits { get; set; }
         public int CountDays { get; set; }
         public string TypeService { get; set; }
-        public string TypeTraining { get; set; }
     }
 }

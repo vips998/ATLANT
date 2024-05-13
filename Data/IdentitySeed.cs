@@ -78,11 +78,11 @@ namespace ATLANT.Data
                 }
             }
 
-            // Создание пользователя-тренера
-            string coachNickname = "SimpleCoach";
-            string coachFio = "Тренеров Тренер Тренерович";
+            // Создание пользователя-тренера Йога
+            string coachNickname = "Kristina";
+            string coachFio = "Иванова Кристина Михайловна";
             string coachPhonenumber = "89123456789";
-            string coachEmail = "coach@mail.com";
+            string coachEmail = "coach1@mail.com";
             string coachPassword = "Aa123456!";
             DateTime coachBirthday = new DateTime(1998, 7, 12);
             if (await userManager.FindByNameAsync(coachEmail) == null)
@@ -101,13 +101,115 @@ namespace ATLANT.Data
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(UserCoach, "coach");
-                    Coach coach = new Coach { UserId = UserCoach.Id };
+                    Coach coach = new Coach { UserId = UserCoach.Id, Description= "Опытный специалист по Йоге. Инструктор фитнеса и бодибилдинга колледжа им. Б. Вейдера\r\nЗолотой знак ГТО V ступени\r\nСеребряный знак ГТО IV ступени\r\nДиплом Шуйского филиала ИВГУ “Физическая культура”",
+                        ImageLink = "https://lh3.google.com/u/0/d/1PDKR7yrdtq4L6rwXr_8FFCy0DFZwiJb6"
+                    };
 
                     context.Coachs.Add(coach); // добавляется тренер в список тренеров
                     await context.SaveChangesAsync();
 
                 }
             }
+
+            // Создание пользователя-тренера
+            string coachNickname2 = "Anna";
+            string coachFio2 = "Королева Анна Сергеевна";
+            string coachPhonenumber2 = "89111111111";
+            string coachEmail2 = "coach2@mail.com";
+            string coachPassword2 = "Aa123456!";
+            DateTime coachBirthday2 = new DateTime(1995, 8, 7);
+            if (await userManager.FindByNameAsync(coachEmail2) == null)
+            {
+                User UserCoach = new User
+                {
+                    Nickname = coachNickname2,
+                    FIO = coachFio2,
+                    PhoneNumber = coachPhonenumber2,
+                    Birthday = coachBirthday2,
+                    Email = coachEmail2,
+                    UserName = coachEmail2,
+                };
+
+                IdentityResult result = await userManager.CreateAsync(UserCoach, coachPassword2);
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(UserCoach, "coach");
+                    Coach coach = new Coach { UserId = UserCoach.Id, Description = "Опытный специалист по Карате. Бронзовый призер чемпионата мира\r\nВице-чемпионка России\r\nМногократный призер российских региональных турниров",
+                        ImageLink = "https://lh3.google.com/u/0/d/1kjd3_Bg7bd1us5xa8CZ2P3QapsXS2Dqe"
+                    };
+
+                    context.Coachs.Add(coach); // добавляется тренер в список тренеров
+                    await context.SaveChangesAsync();
+
+                }
+            }
+
+            // Создание пользователя-тренера
+            string coachNickname3 = "Andrey";
+            string coachFio3 = "Петров Андрей Алексеевич";
+            string coachPhonenumber3 = "89222222222";
+            string coachEmail3 = "coach3@mail.com";
+            string coachPassword3 = "Aa123456!";
+            DateTime coachBirthday3 = new DateTime(1985, 4, 4);
+            if (await userManager.FindByNameAsync(coachEmail3) == null)
+            {
+                User UserCoach = new User
+                {
+                    Nickname = coachNickname3,
+                    FIO = coachFio3,
+                    PhoneNumber = coachPhonenumber3,
+                    Birthday = coachBirthday3,
+                    Email = coachEmail3,
+                    UserName = coachEmail3,
+                };
+
+                IdentityResult result = await userManager.CreateAsync(UserCoach, coachPassword3);
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(UserCoach, "coach");
+                    Coach coach = new Coach { UserId = UserCoach.Id, Description = "Опытный специалист по Боксу и Пауэрлифтингу. Участник международных соревнований по ММА fight night global битва на Волге\r\nЧемпион всероссийских соревнований по ММА \"ДУХ ВОИНА\"\r\nЧемпион всероссийских соревнований по армейскому рукопашному бою среди вооружённых сил России\r\nУчастник всероссийских соревнований по универсальному бою",
+                        ImageLink = "https://lh3.google.com/u/0/d/1gfZEJ9vtLQltHqYpFJzCxqvUoV655w2Z"
+                    };
+
+                    context.Coachs.Add(coach); // добавляется тренер в список тренеров
+                    await context.SaveChangesAsync();
+
+                }
+            }
+
+            // Создание пользователя-тренера
+            string coachNickname4 = "Dwayne";
+            string coachFio4 = "Скала Дуэйн Джонсович";
+            string coachPhonenumber4 = "89333333333";
+            string coachEmail4 = "coach4@mail.com";
+            string coachPassword4 = "Aa123456!";
+            DateTime coachBirthday4 = new DateTime(1972, 5, 2);
+            if (await userManager.FindByNameAsync(coachEmail4) == null)
+            {
+                User UserCoach = new User
+                {
+                    Nickname = coachNickname4,
+                    FIO = coachFio4,
+                    PhoneNumber = coachPhonenumber4,
+                    Birthday = coachBirthday4,
+                    Email = coachEmail4,
+                    UserName = coachEmail4,
+                };
+
+                IdentityResult result = await userManager.CreateAsync(UserCoach, coachPassword4);
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(UserCoach, "coach");
+                    Coach coach = new Coach { UserId = UserCoach.Id, Description = "Опытный специалист по Боксу и Пауэрлифтингу. На протяжении 10 лет работал спасателем Малибу. Мастер спорта по бодибилдингу.",
+                        ImageLink = "https://lh3.google.com/u/0/d/1aDHOvp9SE3Bx1Coy0BVmJgnhYb3pXNQI"
+                    };
+
+                    context.Coachs.Add(coach); // добавляется тренер в список тренеров
+                    await context.SaveChangesAsync();
+
+                }
+            }
+
         }
     }
 }

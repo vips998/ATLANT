@@ -60,5 +60,25 @@ namespace ATLANT.Controllers
 
             return NoContent();
         }
+
+        /*// POST api/<UsersController>
+        // Добавление нового тренера
+        [HttpPost]
+        public async Task<ActionResult<UserDTO>> PostCoach(UserDTO newuser, )
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            ServiceType serviceTYPE = new ServiceType
+            {
+                NameService = service.NameService,
+                Description = service.Description,
+                ImageLink = "https://lh3.google.com/u/0/d/",
+            };
+            _context.ServiceType.Add(serviceTYPE);
+            await _context.SaveChangesAsync();
+            return Ok(serviceTYPE);
+        }*/
     }
 }

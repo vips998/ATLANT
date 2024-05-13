@@ -15,6 +15,11 @@ namespace ATLANT.Models
         [ForeignKey("User")]
         public int UserId { get; set; }
 
+        [StringLength(200)]
+        public string? ImageLink { get; set; }
+        [StringLength(1000)]
+        public string? Description { get; set; }
+
         public virtual ICollection<TimeTable> TimeTable { get; set; }
 
         public virtual ICollection<Shedule> Shedule { get; set; }
