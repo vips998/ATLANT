@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ATLANT.Migrations
 {
     /// <inheritdoc />
-    public partial class init2 : Migration
+    public partial class @new : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -111,6 +111,20 @@ namespace ATLANT.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TypeTraining", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "VisitRegister",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    VisitDate = table.Column<bool>(type: "bit", nullable: false),
+                    IsPresent = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VisitRegister", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -266,18 +280,11 @@ namespace ATLANT.Migrations
                     DateEnd = table.Column<DateTime>(type: "date", nullable: false),
                     CountRemainTraining = table.Column<int>(type: "int", nullable: false),
                     IsValid = table.Column<bool>(type: "bit", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    AbonementId = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Payment", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Payment_Abonement_AbonementId",
-                        column: x => x.AbonementId,
-                        principalTable: "Abonement",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Payment_Clients_UserId",
                         column: x => x.UserId,
@@ -368,30 +375,81 @@ namespace ATLANT.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "VisitRegister",
+                name: "PaymentAbonement",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    VisitDate = table.Column<bool>(type: "bit", nullable: false),
-                    IsPresent = table.Column<bool>(type: "bit", nullable: false),
-                    TimeTableId = table.Column<int>(type: "int", nullable: false),
-                    PaymentId = table.Column<int>(type: "int", nullable: false)
+                    PaymentId = table.Column<int>(type: "int", nullable: false),
+                    AbonementId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_VisitRegister", x => x.Id);
+                    table.PrimaryKey("PK_PaymentAbonement", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_VisitRegister_Payment_PaymentId",
+                        name: "FK_PaymentAbonement_Abonement_AbonementId",
+                        column: x => x.AbonementId,
+                        principalTable: "Abonement",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PaymentAbonement_Payment_PaymentId",
+                        column: x => x.PaymentId,
+                        principalTable: "Payment",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PaymentVisit",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PaymentId = table.Column<int>(type: "int", nullable: false),
+                    VisitRegisterId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PaymentVisit", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PaymentVisit_Payment_PaymentId",
                         column: x => x.PaymentId,
                         principalTable: "Payment",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_VisitRegister_TimeTable_TimeTableId",
+                        name: "FK_PaymentVisit_VisitRegister_VisitRegisterId",
+                        column: x => x.VisitRegisterId,
+                        principalTable: "VisitRegister",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "VisitRegisterTimeTable",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    VisitRegisterId = table.Column<int>(type: "int", nullable: false),
+                    TimeTableId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VisitRegisterTimeTable", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_VisitRegisterTimeTable_TimeTable_TimeTableId",
                         column: x => x.TimeTableId,
                         principalTable: "TimeTable",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_VisitRegisterTimeTable_VisitRegister_VisitRegisterId",
+                        column: x => x.VisitRegisterId,
+                        principalTable: "VisitRegister",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -434,14 +492,29 @@ namespace ATLANT.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Payment_AbonementId",
-                table: "Payment",
-                column: "AbonementId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Payment_UserId",
                 table: "Payment",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PaymentAbonement_AbonementId",
+                table: "PaymentAbonement",
+                column: "AbonementId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PaymentAbonement_PaymentId",
+                table: "PaymentAbonement",
+                column: "PaymentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PaymentVisit_PaymentId",
+                table: "PaymentVisit",
+                column: "PaymentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PaymentVisit_VisitRegisterId",
+                table: "PaymentVisit",
+                column: "VisitRegisterId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Shedule_CoachId",
@@ -479,14 +552,14 @@ namespace ATLANT.Migrations
                 column: "TypeTrainingId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_VisitRegister_PaymentId",
-                table: "VisitRegister",
-                column: "PaymentId");
+                name: "IX_VisitRegisterTimeTable_TimeTableId",
+                table: "VisitRegisterTimeTable",
+                column: "TimeTableId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_VisitRegister_TimeTableId",
-                table: "VisitRegister",
-                column: "TimeTableId");
+                name: "IX_VisitRegisterTimeTable_VisitRegisterId",
+                table: "VisitRegisterTimeTable",
+                column: "VisitRegisterId");
         }
 
         /// <inheritdoc />
@@ -508,25 +581,34 @@ namespace ATLANT.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "PaymentAbonement");
+
+            migrationBuilder.DropTable(
+                name: "PaymentVisit");
+
+            migrationBuilder.DropTable(
                 name: "Shedule");
 
             migrationBuilder.DropTable(
-                name: "VisitRegister");
+                name: "VisitRegisterTimeTable");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "DayWeek");
+                name: "Abonement");
 
             migrationBuilder.DropTable(
                 name: "Payment");
 
             migrationBuilder.DropTable(
+                name: "DayWeek");
+
+            migrationBuilder.DropTable(
                 name: "TimeTable");
 
             migrationBuilder.DropTable(
-                name: "Abonement");
+                name: "VisitRegister");
 
             migrationBuilder.DropTable(
                 name: "Clients");

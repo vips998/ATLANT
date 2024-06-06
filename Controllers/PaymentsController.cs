@@ -25,7 +25,8 @@ namespace ATLANT.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Payment>>> GetPayments()
         {
-            return await _context.Payment.ToListAsync();
+            return await _context.Payment.Include(ps => ps.PaymentAbonement)
+        .ThenInclude(pa => pa.Abonement).ToListAsync();
         }
 
 
@@ -52,7 +53,10 @@ namespace ATLANT.Controllers
             // Получение текущей даты
             var today = DateTime.Now;
 
-            var payments = await _context.Payment.Include(p=>p.Abonement).Where(p=>p.UserId == clientId).ToListAsync();
+            var payments = await _context.Payment
+        .Include(ps => ps.PaymentAbonement)
+        .ThenInclude(pa => pa.Abonement).Where(p => p.UserId == clientId)
+        .ToListAsync();
 
             if (payments == null || !payments.Any())
             {
@@ -110,11 +114,25 @@ namespace ATLANT.Controllers
                 CountRemainTraining = paymentDTO.countRemainTraining,
                 DateStart = paymentDTO.dateStart,
                 DateEnd = paymentDTO.dateEnd,
-                AbonementId = abonementId,
                 UserId = clientId
             };
 
+            PaymentAbonement payAbo = new PaymentAbonement
+            {
+                // PaymentId будет присвоен после сохранения payment, так как PaymentId еще не существует
+                AbonementId = abonementId,
+            };
+            // Добавление объектов в коллекции
+            payment.PaymentAbonement.Add(payAbo);
+
+            // Добавление в контекст и сохранение
             _context.Payment.Add(payment);
+            await _context.SaveChangesAsync();
+
+            // Теперь можно присвоить ID, так как visit уже сохранен и имеет ID
+            payAbo.PaymentId = payment.Id;
+
+            // Сохраняем изменения в контексте
             await _context.SaveChangesAsync();
             return Ok();
         }
@@ -149,7 +167,7 @@ namespace ATLANT.Controllers
         // DELETE api/<PaymentsController>/5
         // Удаление покупки абонемента по id
         [HttpDelete("{id}")]
-        [Authorize(Roles = "admin")] // Ограничение доступа (Только для админа)
+        //[Authorize(Roles = "admin")] // Ограничение доступа (Только для админа)
         public async Task<IActionResult> DeletePayment(int id)
         {
             var payment = await _context.Payment.FindAsync(id);

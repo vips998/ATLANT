@@ -7,6 +7,12 @@ namespace ATLANT.Models
     public class VisitRegister
     {
 
+        public VisitRegister()
+        {
+            PaymentVisits = new HashSet<PaymentVisit>();
+            VisitRegisterTimeTables = new HashSet<VisitRegisterTimeTable>();
+        }
+
         [Key]
         public int Id { get; set; }
 
@@ -16,13 +22,10 @@ namespace ATLANT.Models
         [Required]
         public bool IsPresent { get; set; } // false - пропустил тренировку, true - присутствовал на тренировке 
 
-        [ForeignKey("TimeTable")]
-        public int TimeTableId { get; set; }
-        public virtual TimeTable TimeTable { get; set; }
 
-        [ForeignKey("Payment")]
-        public int PaymentId { get; set; }
-        public virtual Payment Payment { get; set; }
+        public virtual ICollection<VisitRegisterTimeTable> VisitRegisterTimeTables { get; set; }
+
+        public virtual ICollection<PaymentVisit> PaymentVisits { get; set; }
 
     }
 }

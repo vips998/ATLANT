@@ -7,7 +7,8 @@ namespace ATLANT.Models
     {
         public Payment()
         {
-            VisitRegister = new HashSet<VisitRegister>();
+            PaymentVisit = new HashSet<PaymentVisit>();
+            PaymentAbonement = new HashSet<PaymentAbonement>();
         }
         [Key]
         public int Id { get; set; }
@@ -31,11 +32,8 @@ namespace ATLANT.Models
         public int UserId { get; set; }
         public virtual Client Client { get; set; }
 
-        [ForeignKey("Abonement")]
-        public int AbonementId { get; set; }
-        public virtual Abonement Abonement { get; set; }
-
-        public virtual ICollection<VisitRegister> VisitRegister { get; set; }
+        public virtual ICollection<PaymentAbonement> PaymentAbonement { get; set; }
+        public virtual ICollection<PaymentVisit> PaymentVisit { get; set; }
 
     }
 }

@@ -104,7 +104,7 @@ namespace ATLANT.Controllers
             {
                 if (timetable.ServiceTypeId == id)
                 {
-                    var visitRegistersCount = await _context.VisitRegister
+                    var visitRegistersCount = await _context.VisitRegisterTimeTable
                         .Where(vr => vr.TimeTableId == timetable.Id)
                         .CountAsync();
 

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ATLANT.Migrations
 {
     [DbContext(typeof(FitnesContext))]
-    [Migration("20240513030859_init2")]
-    partial class init2
+    [Migration("20240606175415_new")]
+    partial class @new
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -113,9 +113,6 @@ namespace ATLANT.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AbonementId")
-                        .HasColumnType("int");
-
                     b.Property<int>("CountRemainTraining")
                         .HasColumnType("int");
 
@@ -133,11 +130,55 @@ namespace ATLANT.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AbonementId");
-
                     b.HasIndex("UserId");
 
                     b.ToTable("Payment");
+                });
+
+            modelBuilder.Entity("ATLANT.Models.PaymentAbonement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AbonementId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PaymentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AbonementId");
+
+                    b.HasIndex("PaymentId");
+
+                    b.ToTable("PaymentAbonement");
+                });
+
+            modelBuilder.Entity("ATLANT.Models.PaymentVisit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("PaymentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VisitRegisterId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PaymentId");
+
+                    b.HasIndex("VisitRegisterId");
+
+                    b.ToTable("PaymentVisit");
                 });
 
             modelBuilder.Entity("ATLANT.Models.ServiceType", b =>
@@ -360,22 +401,35 @@ namespace ATLANT.Migrations
                     b.Property<bool>("IsPresent")
                         .HasColumnType("bit");
 
-                    b.Property<int>("PaymentId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TimeTableId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("VisitDate")
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PaymentId");
+                    b.ToTable("VisitRegister");
+                });
+
+            modelBuilder.Entity("ATLANT.Models.VisitRegisterTimeTable", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("TimeTableId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VisitRegisterId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("TimeTableId");
 
-                    b.ToTable("VisitRegister");
+                    b.HasIndex("VisitRegisterId");
+
+                    b.ToTable("VisitRegisterTimeTable");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
@@ -535,21 +589,51 @@ namespace ATLANT.Migrations
 
             modelBuilder.Entity("ATLANT.Models.Payment", b =>
                 {
-                    b.HasOne("ATLANT.Models.Abonement", "Abonement")
-                        .WithMany("Payment")
-                        .HasForeignKey("AbonementId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("ATLANT.Models.Client", "Client")
                         .WithMany("Payment")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Client");
+                });
+
+            modelBuilder.Entity("ATLANT.Models.PaymentAbonement", b =>
+                {
+                    b.HasOne("ATLANT.Models.Abonement", "Abonement")
+                        .WithMany("PaymentAbonements")
+                        .HasForeignKey("AbonementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ATLANT.Models.Payment", "Payment")
+                        .WithMany("PaymentAbonement")
+                        .HasForeignKey("PaymentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Abonement");
 
-                    b.Navigation("Client");
+                    b.Navigation("Payment");
+                });
+
+            modelBuilder.Entity("ATLANT.Models.PaymentVisit", b =>
+                {
+                    b.HasOne("ATLANT.Models.Payment", "Payment")
+                        .WithMany("PaymentVisit")
+                        .HasForeignKey("PaymentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ATLANT.Models.VisitRegister", "VisitRegister")
+                        .WithMany("PaymentVisits")
+                        .HasForeignKey("VisitRegisterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Payment");
+
+                    b.Navigation("VisitRegister");
                 });
 
             modelBuilder.Entity("ATLANT.Models.Shedule", b =>
@@ -614,23 +698,23 @@ namespace ATLANT.Migrations
                     b.Navigation("TypeTraining");
                 });
 
-            modelBuilder.Entity("ATLANT.Models.VisitRegister", b =>
+            modelBuilder.Entity("ATLANT.Models.VisitRegisterTimeTable", b =>
                 {
-                    b.HasOne("ATLANT.Models.Payment", "Payment")
-                        .WithMany("VisitRegister")
-                        .HasForeignKey("PaymentId")
+                    b.HasOne("ATLANT.Models.TimeTable", "TimeTable")
+                        .WithMany("VisitRegisterTimeTable")
+                        .HasForeignKey("TimeTableId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ATLANT.Models.TimeTable", "TimeTable")
-                        .WithMany("VisitRegister")
-                        .HasForeignKey("TimeTableId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                    b.HasOne("ATLANT.Models.VisitRegister", "VisitRegister")
+                        .WithMany("VisitRegisterTimeTables")
+                        .HasForeignKey("VisitRegisterId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Payment");
-
                     b.Navigation("TimeTable");
+
+                    b.Navigation("VisitRegister");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -686,7 +770,7 @@ namespace ATLANT.Migrations
 
             modelBuilder.Entity("ATLANT.Models.Abonement", b =>
                 {
-                    b.Navigation("Payment");
+                    b.Navigation("PaymentAbonements");
                 });
 
             modelBuilder.Entity("ATLANT.Models.Client", b =>
@@ -708,7 +792,9 @@ namespace ATLANT.Migrations
 
             modelBuilder.Entity("ATLANT.Models.Payment", b =>
                 {
-                    b.Navigation("VisitRegister");
+                    b.Navigation("PaymentAbonement");
+
+                    b.Navigation("PaymentVisit");
                 });
 
             modelBuilder.Entity("ATLANT.Models.ServiceType", b =>
@@ -720,7 +806,7 @@ namespace ATLANT.Migrations
 
             modelBuilder.Entity("ATLANT.Models.TimeTable", b =>
                 {
-                    b.Navigation("VisitRegister");
+                    b.Navigation("VisitRegisterTimeTable");
                 });
 
             modelBuilder.Entity("ATLANT.Models.TypeTraining", b =>
@@ -735,6 +821,13 @@ namespace ATLANT.Migrations
                     b.Navigation("Client");
 
                     b.Navigation("Coach");
+                });
+
+            modelBuilder.Entity("ATLANT.Models.VisitRegister", b =>
+                {
+                    b.Navigation("PaymentVisits");
+
+                    b.Navigation("VisitRegisterTimeTables");
                 });
 #pragma warning restore 612, 618
         }

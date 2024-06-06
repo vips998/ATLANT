@@ -80,9 +80,9 @@ namespace ATLANT.Controllers
                 return NotFound();
             }
 
-            //проверяем на поесещение
+            //проверяем на посещение
             var timetableForVisit = await _context.TimeTable
-        .Include(t => t.VisitRegister)
+        .Include(t => t.VisitRegisterTimeTable)
         .FirstOrDefaultAsync(t => t.Id == id);
 
             if (timetableForVisit == null)
@@ -90,7 +90,7 @@ namespace ATLANT.Controllers
                 return NotFound();
             }
 
-            if (timetableForVisit.VisitRegister?.Count > 0)
+            if (timetableForVisit.VisitRegisterTimeTable?.Count > 0)
                 {
                 // нельзя изменить тренировку с посещениями
                 return BadRequest();
@@ -114,11 +114,11 @@ namespace ATLANT.Controllers
         // DELETE api/<TimeTablesController>/5
         // Удаление тренировки по id
         [HttpDelete("{id}")]
-        [Authorize(Roles = "admin")] // Ограничение доступа (Только для админа)
+        //[Authorize(Roles = "admin")] // Ограничение доступа (Только для админа)
         public async Task<IActionResult> DeleteTimeTables(int id)
         {
             var timetable = await _context.TimeTable
-        .Include(t => t.VisitRegister)
+        .Include(t => t.VisitRegisterTimeTable)
         .FirstOrDefaultAsync(t => t.Id == id);
 
             if (timetable == null)
@@ -126,10 +126,10 @@ namespace ATLANT.Controllers
                 return NotFound();
             }
 
-            if (timetable.VisitRegister?.Count > 0)
+/*            if (timetable.VisitRegisterTimeTable?.Count > 0)
             {
                 return BadRequest("Нельзя удалить тренировку с записанными клиентами.");
-            }
+            }*/
             _context.TimeTable.Remove(timetable);
             await _context.SaveChangesAsync();
             return NoContent();

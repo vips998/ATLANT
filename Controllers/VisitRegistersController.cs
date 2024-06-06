@@ -27,9 +27,12 @@ namespace ATLANT.Controllers
         public async Task<ActionResult<IEnumerable<VisitRegister>>> GetVisitRegisters()
         {
             var today = DateTime.Today;
-            var allVisits = await _context.VisitRegister.ToListAsync();
-            var allTimetables = await _context.TimeTable.ToListAsync();
-            var visitRegisters = allVisits.Where(vr => allTimetables.Any(tt => tt.Id == vr.TimeTableId && tt.Date < today));
+            var visitRegisters = await _context.VisitRegister
+                 .Include(vr => vr.PaymentVisits)
+        .Include(vr => vr.VisitRegisterTimeTables)
+        .ThenInclude(vrt => vrt.TimeTable)
+        .Where(vr => vr.VisitRegisterTimeTables.Any(vrt => vrt.TimeTable.Date < today))
+        .ToListAsync();
 
             foreach (var visitRegister in visitRegisters)
             {
@@ -38,7 +41,8 @@ namespace ATLANT.Controllers
 
             await _context.SaveChangesAsync();
 
-            return await _context.VisitRegister.ToListAsync();
+            return await _context.VisitRegister.Include(vr => vr.PaymentVisits)
+        .Include(vr => vr.VisitRegisterTimeTables).ToListAsync();
         }
 
         // Получаем одну запись
@@ -61,9 +65,16 @@ namespace ATLANT.Controllers
         {
             // сначала проверяем на дату все записи
             var today = DateTime.Today;
-            var allVisits = await _context.VisitRegister.ToListAsync();
-            var allTimetables = await _context.TimeTable.ToListAsync();
-            var visitRegisters = allVisits.Where(vr => allTimetables.Any(tt => tt.Id == vr.TimeTableId && tt.Date < today));
+            var visitRegisters  = await _context.VisitRegister
+        .Include(vr => vr.PaymentVisits)
+            .ThenInclude(pv => pv.Payment)
+                .ThenInclude(p => p.PaymentAbonement)
+                .ThenInclude(p => p.Abonement)
+        .Include(vr => vr.VisitRegisterTimeTables)
+            .ThenInclude(vrt => vrt.TimeTable)
+        .Where(vr => vr.PaymentVisits.Any(pv => pv.Payment.UserId == clientId) &&
+                     vr.VisitRegisterTimeTables.Any(vrt => vrt.TimeTable.Date < today))
+        .ToListAsync();
 
             foreach (var visitRegister in visitRegisters)
             {
@@ -72,8 +83,11 @@ namespace ATLANT.Controllers
 
             await _context.SaveChangesAsync();
             /////
-
-            var visits = await _context.VisitRegister.Include(p => p.Payment).Where(p => p.Payment.UserId == clientId).ToListAsync();
+            var visits = await _context.VisitRegister.Include(vs => vs.PaymentVisits).ThenInclude(pv => pv.Payment)
+                .ThenInclude(p => p.PaymentAbonement)
+                .ThenInclude(p => p.Abonement)
+        .Include(vs => vs.VisitRegisterTimeTables)
+    .Where(vr => vr.PaymentVisits.Any(pv => pv.Payment.UserId == clientId)).ToListAsync();
 
              if (visits == null || !visits.Any())
             {
@@ -86,27 +100,34 @@ namespace ATLANT.Controllers
         // POST api/<VisitRegistersController>
         // Добавление новой записи на тренировку
         [HttpPost]
-        public async Task<ActionResult<VisitRegisterDTO>> PostVisitRegister([FromBody] VisitRegisterDTO visitRegister)
+        public async Task<ActionResult<VisitRegisterDTO>> PostVisitRegister(VisitRegisterDTO visitRegister)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
             // Получение клиента по идентификатору
-            var payment = await _context.Payment.FindAsync(visitRegister.PaymentId);
+            var payment = await _context.Payment.FindAsync(visitRegister.paymentId);
             if (payment == null)
             {
-                return NotFound($"Оплата с данным id {visitRegister.PaymentId} не найдена.");
+                return NotFound($"Оплата с данным id {visitRegister.paymentId} не найдена.");
             }
-            var timetable = await _context.TimeTable.FindAsync(visitRegister.TimeTableId);
+            var timetable = await _context.TimeTable.FindAsync(visitRegister.timetableId);
             if (timetable == null)
             {
-                return NotFound($"Тренировка с данным id {visitRegister.TimeTableId} не найдена.");
+                return NotFound($"Тренировка с данным id {visitRegister.timetableId} не найдена.");
             }
+            
+            var visitTimeTable = await _context.VisitRegisterTimeTable.Where(vr => vr.TimeTableId == visitRegister.timetableId).ToListAsync();
+            var payVisit = await _context.PaymentVisit.Where(vr => vr.PaymentId == visitRegister.paymentId).ToListAsync();
+
+
+
 
             // Проверка наличия существующей записи
-            var existingVisitRegister = await _context.VisitRegister
-                .FirstOrDefaultAsync(vr => vr.PaymentId == visitRegister.PaymentId && vr.TimeTableId == visitRegister.TimeTableId);
+            var existingVisitRegister = visitTimeTable
+                    .Join(payVisit, vtt => vtt.TimeTableId, pv => pv.VisitRegisterId, (vtt, pv) => vtt)
+                    .FirstOrDefault();
 
             if (existingVisitRegister != null)
             {
@@ -116,16 +137,42 @@ namespace ATLANT.Controllers
             payment.CountRemainTraining -= 1;
             _context.Payment.Update(payment);
 
+            // Создание объектов
             VisitRegister visit = new VisitRegister
             {
                 IsPresent = visitRegister.IsPresent,
                 VisitDate = visitRegister.VisitDate,
-                TimeTableId = visitRegister.TimeTableId,
-                PaymentId = visitRegister.PaymentId
+                PaymentVisits = new List<PaymentVisit>(),
+                VisitRegisterTimeTables = new List<VisitRegisterTimeTable>(),
             };
 
+            VisitRegisterTimeTable visitTime = new VisitRegisterTimeTable
+            {
+                // TimeTableId будет присвоен после сохранения VisitRegister, так как VisitRegisterId еще не существует
+                TimeTableId = visitRegister.timetableId,
+            };
+
+            PaymentVisit paymentVisit = new PaymentVisit
+            {
+                // PaymentId будет присвоен после сохранения VisitRegister, так как VisitRegisterId еще не существует
+                PaymentId = visitRegister.paymentId,
+            };
+
+            // Добавление объектов в коллекции
+            visit.VisitRegisterTimeTables.Add(visitTime);
+            visit.PaymentVisits.Add(paymentVisit);
+
+            // Добавление в контекст и сохранение
             _context.VisitRegister.Add(visit);
             await _context.SaveChangesAsync();
+
+            // Теперь можно присвоить ID, так как visit уже сохранен и имеет ID
+            visitTime.VisitRegisterId = visit.Id;
+            paymentVisit.VisitRegisterId = visit.Id;
+
+            // Сохраняем изменения в контексте
+            await _context.SaveChangesAsync();
+
             return Ok();
         }
 
@@ -161,12 +208,29 @@ namespace ATLANT.Controllers
             {
                 return NotFound();
             }
-            // При отмене действующей записи
-            var payment = await _context.Payment.FindAsync(visit.PaymentId);
-            payment.CountRemainTraining += 1;
-            _context.Payment.Update(payment);
+            // Получение связанных записей
+            var visitTimeTable = await _context.VisitRegisterTimeTable
+                .FirstOrDefaultAsync(vrt => vrt.VisitRegisterId == id);
+            var paymentVisit = await _context.PaymentVisit
+                .FirstOrDefaultAsync(pv => pv.VisitRegisterId == id);
+
+            // Удаление записей
+            if (paymentVisit != null)
+            {
+                // При отмене действующей записи
+                var payment = await _context.Payment.FindAsync(paymentVisit.PaymentId);
+                payment.CountRemainTraining += 1;
+                _context.PaymentVisit.Remove(paymentVisit);
+                _context.Payment.Update(payment);
+            }
+            if (visitTimeTable != null)
+            {
+                _context.VisitRegisterTimeTable.Remove(visitTimeTable);
+            }
             _context.VisitRegister.Remove(visit);
+
             await _context.SaveChangesAsync();
+
             return NoContent();
         }
     }

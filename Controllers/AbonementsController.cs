@@ -26,7 +26,7 @@ namespace ATLANT.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Abonement>>> GetAbonements()
         {
-            return await _context.Abonement.Include(p => p.Payment).ToListAsync();
+            return await _context.Abonement.Include(p => p.PaymentAbonements).ThenInclude(p => p.Payment).ToListAsync();
         }
 
         // GET api/<AbonementsController>/5
@@ -97,7 +97,7 @@ namespace ATLANT.Controllers
         // DELETE api/<AbonementsController>/5
         // Удаление абонемента по id
         [HttpDelete("{id}")]
-        [Authorize(Roles ="admin")] // Ограничение доступа (Только для админа)
+        //[Authorize(Roles ="admin")] // Ограничение доступа (Только для админа)
         public async Task<IActionResult> DeleteAbonement(int id)
         {
             var abonement = await _context.Abonement.FindAsync(id);

@@ -12,7 +12,7 @@ namespace ATLANT.DTO
 
         public bool IsPresent { get; set; } // false - пропустил тренировку, true - присутствовал на тренировке 
 
-        public int TimeTableId { get; set; }
-        public int PaymentId { get; set; }
+        public int timetableId { get; set; }
+        public int paymentId { get; set; }
     }
 }

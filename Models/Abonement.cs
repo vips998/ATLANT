@@ -7,7 +7,7 @@ namespace ATLANT.Models
     {
         public Abonement()
         {
-            Payment = new HashSet<Payment>();
+            PaymentAbonements = new HashSet<PaymentAbonement>();
         }
         [Key]
         public int Id { get; set; }
@@ -25,6 +25,7 @@ namespace ATLANT.Models
         [Required]
         public string TypeService { get; set; }
         [Required]
-        public virtual ICollection<Payment> Payment { get; set; }
+
+        public virtual ICollection<PaymentAbonement> PaymentAbonements { get; set; }
     }
 }

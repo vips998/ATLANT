@@ -37,14 +37,11 @@ namespace ATLANT.Models
         public virtual DbSet<ServiceType> ServiceType { get; set; }
         public virtual DbSet<Shedule> Shedule { get; set; }
         public virtual DbSet<DayWeek> DayWeek { get; set; }
+        public virtual DbSet<PaymentVisit> PaymentVisit { get; set; }
+        public virtual DbSet<VisitRegisterTimeTable> VisitRegisterTimeTable { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<VisitRegister>()
-    .HasOne(v => v.TimeTable)
-    .WithMany(t => t.VisitRegister)
-    .HasForeignKey(v => v.TimeTableId)
-    .OnDelete(DeleteBehavior.NoAction);
             base.OnModelCreating(modelBuilder);
         }
     }

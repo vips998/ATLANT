@@ -7,7 +7,7 @@ namespace ATLANT.Models
     {
         public TimeTable()
         {
-            VisitRegister = new HashSet<VisitRegister>();
+            VisitRegisterTimeTable = new HashSet<VisitRegisterTimeTable>();
         }
         [Key]
         public int Id { get; set; }
@@ -36,7 +36,7 @@ namespace ATLANT.Models
         public int TypeTrainingId { get; set; }
         public virtual TypeTraining TypeTraining { get; set; }
 
-        public virtual ICollection<VisitRegister> VisitRegister { get; set; }
+        public virtual ICollection<VisitRegisterTimeTable> VisitRegisterTimeTable { get; set; }
 
 
     }
