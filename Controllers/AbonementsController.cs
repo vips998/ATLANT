@@ -47,7 +47,7 @@ namespace ATLANT.Controllers
         // POST api/<AbonementsController>
         // Добавление нового абонемента
         [HttpPost]
-        public async Task<ActionResult<AbonementDTO>> PostAbonement(AbonementDTO abonement)
+        public async Task<ActionResult<Abonement>> PostAbonement(AbonementDTO abonement)
         {
             if(!ModelState.IsValid)
             {
@@ -64,6 +64,7 @@ namespace ATLANT.Controllers
             };
             _context.Abonement.Add(abo);
             await _context.SaveChangesAsync();
+            //return abo;
             return Ok(abo);
         }
 

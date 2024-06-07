@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ATLANT.Migrations
 {
     [DbContext(typeof(FitnesContext))]
-    [Migration("20240606175415_new")]
+    [Migration("20240607225942_new")]
     partial class @new
     {
         /// <inheritdoc />

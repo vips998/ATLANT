@@ -65,7 +65,7 @@ namespace ATLANT.Controllers
         }
 
         // POST api/<ShedulesController>
-        // Добавление нового абонемента
+        // Добавление новой тренировки шаблона
 
         [HttpPost]
         public async Task<ActionResult<Shedule>> PostShedule(SheduleDTO newShedule)
@@ -85,6 +85,7 @@ namespace ATLANT.Controllers
             _context.Shedule.Add(shedule);
             await _context.SaveChangesAsync();
 
+            //return shedule;
             return Ok(shedule);
         }
 

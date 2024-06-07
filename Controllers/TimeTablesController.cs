@@ -42,7 +42,7 @@ namespace ATLANT.Controllers
         }
 
         // POST api/<TimeTablesController>
-        // Добавление нового абонемента
+        // Добавление новой тренировки
 
         [HttpPost]
         public async Task<ActionResult<TimeTable>> PostTimeTable(TimeTableDTO newTimeTable)
@@ -60,7 +60,8 @@ namespace ATLANT.Controllers
 
             _context.TimeTable.Add(timetable);
             await _context.SaveChangesAsync();
-
+            
+            //return timetable;
             return Ok(timetable);
         }
 

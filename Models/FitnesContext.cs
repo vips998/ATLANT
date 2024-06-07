@@ -12,20 +12,20 @@ namespace ATLANT.Models
         //////// Информация о подключении к БД
         protected readonly IConfiguration Configuration;
         public FitnesContext(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+       {
+           Configuration = configuration;
+       }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
-        {
-            options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
-        }
-        ////////////////
+       {
+           options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+       }
+       ////////////////
 
-        #region Constructor
-        /*public FitnesContext(DbContextOptions<FitnesContext> options) : base(options)
-        { }*/
-        #endregion
+       #region Constructor
+       /*public FitnesContext(DbContextOptions<FitnesContext> options) : base(options)
+       { }*/
+#endregion
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Client> Clients { get; set; }
         public virtual DbSet<Coach> Coachs { get; set; }
